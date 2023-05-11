@@ -1,15 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { UserDocument, User } from "../models/user.schema";
+import { User, UserModel } from "../models/user.schema";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
+import { UserInterface } from "src/utils/interfaces";
 
 @Injectable()
 export class UserService {
-	constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+	constructor(@InjectModel(User.name) private userModel: UserModel) {}
 
-	async signup(user: User) {
+	async signup(user: UserInterface) {
 		const salt = await bcrypt.genSalt();
 		const hash = await bcrypt.hash(user.password, salt);
 
@@ -24,7 +24,7 @@ export class UserService {
 		return newUser.save();
 	}
 
-	async login(user: User, jwt: JwtService) {
+	async login(user: UserInterface, jwt: JwtService) {
 		const foundUser = await this.userModel.findOne({ email: user.email });
 
 		if (foundUser) {
