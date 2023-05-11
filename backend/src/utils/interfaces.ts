@@ -28,5 +28,13 @@ export interface DietPlanInterface {
 	frequency: "daily" | "weekly";
 	meals: MealSchemaInterface[];
 	days: DaysInterface;
-	dietPlan: null | DietPlanInterface;
+	weeklyDietPlan: null | DietPlanInterface;
+}
+
+export interface UserInterface {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+	dietPlans: DietPlanInterface[];
 }

@@ -17,7 +17,7 @@ export const DietPlanSchema = new Schema<DietPlanInterface, DietPlanModel>(
 			saturday: { type: mongoose.Types.ObjectId, ref: "DietPlan" },
 			sunday: { type: mongoose.Types.ObjectId, ref: "DietPlan" },
 		},
-		dietPlan: { type: mongoose.Types.ObjectId, ref: "DietPlan" },
+		weeklyDietPlan: { type: mongoose.Types.ObjectId, ref: "DietPlan" },
 	},
 	{
 		timestamps: true,
