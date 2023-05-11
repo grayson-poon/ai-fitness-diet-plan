@@ -1,12 +1,12 @@
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from "@nestjs/jwt";
 import {
 	Injectable,
 	NestMiddleware,
 	HttpException,
 	HttpStatus,
-} from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { UserService } from './services/user.service';
+} from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+import { UserService } from "./services/user.service";
 
 interface UserRequest extends Request {
 	user: any;
@@ -23,9 +23,9 @@ export class isAuthenticated implements NestMiddleware {
 		try {
 			if (
 				req.headers.authorization &&
-				req.headers.authorization.startsWith('Bearer')
+				req.headers.authorization.startsWith("Bearer")
 			) {
-				const token = req.headers.authorization.split(' ')[1];
+				const token = req.headers.authorization.split(" ")[1];
 				const decoded = await this.jwtService.verify(token);
 
 				const user = await this.userService.getOneUser(decoded.email);
@@ -33,13 +33,13 @@ export class isAuthenticated implements NestMiddleware {
 					req.user = user;
 					next();
 				} else {
-					throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+					throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
 				}
 			} else {
-				throw new HttpException('No token found', HttpStatus.NOT_FOUND);
+				throw new HttpException("No token found", HttpStatus.NOT_FOUND);
 			}
 		} catch (error) {
-			throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+			throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
 		}
 	}
 }
