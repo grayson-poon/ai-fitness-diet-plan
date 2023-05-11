@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongodb";
-import { defaultSchemaOptions } from "src/utils/constants";
 
-@Schema({ ...defaultSchemaOptions })
+@Schema({ timestamps: true, id: true })
 export class User {
 	@Prop({ required: true })
 	firstName: string;
