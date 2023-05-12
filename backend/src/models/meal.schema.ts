@@ -1,8 +1,10 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { MealInterface } from "src/utils/interfaces";
 
+// type of Model based on the MealInterface
 export type MealModel = Model<MealInterface>;
 
+// mongoose Schema formatted by the MealInterface with a type of MealModel
 export const MealSchema = new Schema<MealInterface, MealModel>(
 	{
 		name: { type: String, required: true },
@@ -26,6 +28,7 @@ export const MealSchema = new Schema<MealInterface, MealModel>(
 	},
 );
 
+// mongoose Model used to create Meal Documents
 export const Meal = mongoose.model<MealInterface, MealModel>(
 	"Meal",
 	MealSchema,

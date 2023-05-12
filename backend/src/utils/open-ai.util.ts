@@ -10,15 +10,14 @@ export const sampleResponse1 =
 export const sampleResponse2 =
 	"Here's a sample daily fitness diet plan:\n\nBreakfast:\n- 2 eggs, scrambled or fried in 1 teaspoon of olive oil\n- 1 slice whole grain toast\n- 1 small apple\n- 1 cup of skim or low-fat milk\n\nSnack:\n- 1 small handful of almonds\n- 1 medium-sized banana\n\nLunch:\n- Grilled chicken breast, 4-6 oz.\n- 1 cup of mixed vegetables (broccoli, carrots, bell peppers, onions, etc.) sautéed in 1 tablespoon of olive oil\n- 1 small sweet potato, baked or roasted\n- 1 cup of water\n\nSnack:\n- Greek yogurt, 1 small container (6-8 oz.)\n- 1 small peach, diced\n\nDinner:\n- Baked salmon fillet, 4-6 oz.\n- Quinoa or brown rice, 1 cup cooked\n- Steamed asparagus, 1 cup\n- 1 small orange\n\nNote: This is just a sample and can be modified based on your personal preferences and dietary needs. It's important to eat a balanced diet that includes protein, healthy fats, complex carbs, and plenty of fruits and vegetables to support your fitness goals. Also, make sure to hydrate properly throughout the day by drinking enough water.";
 
-interface MealDetails {
-	name: string;
-	components: string[];
-}
-
+// OpenAI API spits out meal components in a dashed list
+// If the isolated string starts with "- ", it's a meal component
 const isMealComponent = (str: string): boolean => {
 	return str.indexOf("- ") === 0;
 };
 
+// Format the API response by removing newline characters and colons to isolate
+// relevant parts
 const formatApiResponse = (response: string): string[] => {
 	const results: string[] = [];
 	const parts = response.split("\n");
@@ -32,6 +31,15 @@ const formatApiResponse = (response: string): string[] => {
 	return results;
 };
 
+// Create an interface to represent the details of a meal that's been extracted
+// from the API response
+interface MealDetails {
+	name: string;
+	components: string[];
+}
+
+// extract the meal details from the formatted strings generated from the API
+// response
 const findMealDetails = (parts: string[]): MealDetails[] => {
 	const mealDetails = [];
 
@@ -43,7 +51,7 @@ const findMealDetails = (parts: string[]): MealDetails[] => {
 			!isMealComponent(parts[nameIdx]) &&
 			isMealComponent(parts[componentIdx])
 		) {
-			const meal = {
+			const detail = {
 				name: parts[nameIdx],
 				components: [],
 			};
@@ -52,14 +60,14 @@ const findMealDetails = (parts: string[]): MealDetails[] => {
 				const component = parts[componentIdx];
 
 				if (isMealComponent(component)) {
-					meal.components.push(component.slice(2));
+					detail.components.push(component.slice(2));
 				} else {
 					break;
 				}
 				componentIdx++;
 			}
 
-			mealDetails.push(meal);
+			mealDetails.push(detail);
 			i = componentIdx;
 		}
 	}
@@ -71,10 +79,12 @@ const findMealDetails = (parts: string[]): MealDetails[] => {
 	return mealDetails;
 };
 
+// generate a list of MealDetails to quickly create MealDocuments and add to
+// a DietPlan
 export const extractMealsFromApiResponse = (
 	mealModel: MealModel,
 	response: string,
-) => {
+): MealInterface[] => {
 	const listOfMeals: MealInterface[] = [];
 	const formattedStrings: string[] = formatApiResponse(response);
 	const allMealDetails = findMealDetails(formattedStrings);
