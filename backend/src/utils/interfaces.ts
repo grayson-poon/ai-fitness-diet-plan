@@ -18,7 +18,7 @@ interface DaysInterface {
 }
 
 export interface MealInterface extends Document {
-	mealNumber: number;
+	name: string;
 	components: string[];
 	macros: MacrosInterface;
 	recipeLink: string | null;

@@ -5,7 +5,7 @@ export type MealModel = Model<MealInterface>;
 
 export const MealSchema = new Schema<MealInterface, MealModel>(
 	{
-		mealNumber: { type: Number, required: true },
+		name: { type: String, required: true },
 		components: { type: [String], required: true, default: [] },
 		macros: {
 			protein: { type: Number, default: null },
