@@ -1,3 +1,29 @@
+// import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+
+// @Schema({ timestamps: true, id: true })
+// export class User {
+// 	@Prop()
+// 	firstName: string;
+
+// 	@Prop()
+// 	lastName: string;
+
+// 	@Prop()
+// 	email: string;
+
+// 	@Prop()
+// 	password: string;
+
+// 	@Prop()
+// 	dietPlans: string[];
+// }
+
+// console.log(User.name, "HELLO#");
+
+// export const UserSchema = SchemaFactory.createForClass(User);
+
+// ------------------------------------
+
 import mongoose, { Model, Schema } from "mongoose";
 import { UserInterface } from "src/utils/interfaces";
 

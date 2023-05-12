@@ -4,23 +4,26 @@ import { User, UserModel } from "../models/user.schema";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { UserInterface } from "src/utils/interfaces";
+import { HydratedDocument, Model } from "mongoose";
 
 @Injectable()
 export class UserService {
-	constructor(@InjectModel(User.name) private userModel: UserModel) {}
+	constructor(
+		@InjectModel(User.collection.name) private userModel: UserModel,
+	) {}
 
-	async signup(user: UserInterface) {
+	async signup(user: UserInterface): Promise<HydratedDocument<UserInterface>> {
 		const salt = await bcrypt.genSalt();
 		const hash = await bcrypt.hash(user.password, salt);
 
-		const body = {
+		const newUser = new this.userModel({
 			firstName: user.firstName,
 			lastName: user.lastName,
 			email: user.email,
 			password: hash,
-		};
+			dietPlans: user.dietPlans,
+		});
 
-		const newUser = new this.userModel(body);
 		return newUser.save();
 	}
 
