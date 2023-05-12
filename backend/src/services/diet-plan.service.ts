@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import {
+	HttpException,
+	HttpStatus,
+	Inject,
+	Injectable,
+	Logger,
+	LoggerService,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ObjectId } from "mongoose";
 import { openai } from "src/config/open-ai.config";
@@ -8,9 +15,12 @@ import { extractMealsFromApiResponse } from "src/utils/open-ai.util";
 
 @Injectable()
 export class DietPlanService {
+	logContext: string = DietPlanService.name;
+
 	constructor(
 		@InjectModel(DietPlan.collection.name) private dietPlanModel: DietPlanModel,
 		@InjectModel(Meal.collection.name) private mealModel: MealModel,
+		@Inject(Logger) private readonly logger: LoggerService,
 	) {}
 
 	async findDietPlan(id: ObjectId) {
@@ -22,6 +32,7 @@ export class DietPlanService {
 
 	async createDietPlan(request: string) {
 		try {
+			this.logger.log(request, this.logContext);
 			const query = await openai.createChatCompletion({
 				model: "gpt-3.5-turbo",
 				messages: [
@@ -31,7 +42,10 @@ export class DietPlanService {
 					},
 				],
 			});
+			const response = query.data.choices[0].message.content;
+			this.logger.log(response, this.logContext);
 
+			// TO-DO: enable input of frequency into the query: default "daily"
 			const newDietPlan = new this.dietPlanModel({
 				frequency: "daily",
 				meals: [],
@@ -40,10 +54,12 @@ export class DietPlanService {
 
 			const dietPlan = await newDietPlan.save();
 
-			const response = query.data.choices[0].message.content;
-			console.log(response, "RESPONSE");
+			this.logger.log(
+				`New dietPlan Document created - ${dietPlan}`,
+				this.logContext,
+			);
+
 			const listOfMeals = extractMealsFromApiResponse(this.mealModel, response);
-			console.log(listOfMeals, "LIST OF MEALS");
 
 			const listOfMealDocuments = await Promise.all(
 				listOfMeals.map(async (meal) => {
@@ -51,11 +67,16 @@ export class DietPlanService {
 					return await meal.save();
 				}),
 			);
+			this.logger.log(
+				`listOfMealDocuments - ${listOfMealDocuments}`,
+				this.logContext,
+			);
 
 			newDietPlan.meals = listOfMealDocuments;
 			console.log(listOfMealDocuments, "HERE");
 			return newDietPlan.save();
 		} catch (error) {
+			this.logger.error(error, this.logContext);
 			throw new HttpException(
 				"Couldn't create diet plan",
 				HttpStatus.BAD_REQUEST,
