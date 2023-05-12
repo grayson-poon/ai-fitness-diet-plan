@@ -28,10 +28,8 @@ export class DietPlanController {
 	@Post("")
 	async createDietPlan(
 		@Res() response: Response,
-		// @Body() dietPlan: DietPlan,
 		@Body("request") request: string,
 	): Promise<Response> {
-		console.log(request, "HERE");
 		const newDietPlan = await this.dietPlanService.createDietPlan(request);
 		return response.status(HttpStatus.CREATED).json({ newDietPlan });
 	}

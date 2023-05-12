@@ -1,3 +1,5 @@
+import { Document } from "mongoose";
+
 interface MacrosInterface {
 	protein: number;
 	carbohydrates: number;
@@ -15,7 +17,7 @@ interface DaysInterface {
 	sunday: DietPlanInterface;
 }
 
-export interface MealSchemaInterface {
+export interface MealInterface extends Document {
 	mealNumber: number;
 	components: string[];
 	macros: MacrosInterface;
@@ -23,15 +25,15 @@ export interface MealSchemaInterface {
 	dietPlan: DietPlanInterface;
 }
 
-export interface DietPlanInterface {
+export interface DietPlanInterface extends Document {
 	name: string;
 	frequency: "daily" | "weekly";
-	meals: MealSchemaInterface[];
+	meals: MealInterface[];
 	days: DaysInterface;
 	weeklyDietPlan: null | DietPlanInterface;
 }
 
-export interface UserInterface {
+export interface UserInterface extends Document {
 	firstName: string;
 	lastName: string;
 	email: string;

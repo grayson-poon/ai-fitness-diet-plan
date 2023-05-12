@@ -1,9 +1,9 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { MealSchemaInterface } from "src/utils/interfaces";
+import { MealInterface } from "src/utils/interfaces";
 
-type MealSchemaModel = Model<MealSchemaInterface>;
+export type MealModel = Model<MealInterface>;
 
-export const MealSchema = new Schema<MealSchemaInterface, MealSchemaModel>(
+export const MealSchema = new Schema<MealInterface, MealModel>(
 	{
 		mealNumber: { type: Number, required: true },
 		components: { type: [String], required: true, default: [] },
@@ -13,7 +13,7 @@ export const MealSchema = new Schema<MealSchemaInterface, MealSchemaModel>(
 			fat: { type: Number, default: null },
 			calories: { type: Number, default: null },
 		},
-		recipeLink: { type: String, required: true, default: null },
+		recipeLink: { type: String, default: null },
 		dietPlan: {
 			type: mongoose.Types.ObjectId,
 			ref: "DietPlan",
@@ -26,7 +26,7 @@ export const MealSchema = new Schema<MealSchemaInterface, MealSchemaModel>(
 	},
 );
 
-export const Meal = mongoose.model<MealSchemaInterface, MealSchemaModel>(
+export const Meal = mongoose.model<MealInterface, MealModel>(
 	"Meal",
 	MealSchema,
 );

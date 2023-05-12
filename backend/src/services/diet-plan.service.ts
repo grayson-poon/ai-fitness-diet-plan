@@ -3,12 +3,14 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ObjectId } from "mongoose";
 import { openai } from "src/config/open-ai.config";
 import { DietPlan, DietPlanModel } from "src/models/diet-plan.schema";
+import { Meal, MealModel } from "src/models/meal.schema";
+import { extractMealsFromApiResponse } from "src/utils/open-ai.util";
 
 @Injectable()
 export class DietPlanService {
 	constructor(
-		@InjectModel(DietPlan.name)
-		private dietPlanModel: DietPlanModel,
+		@InjectModel(DietPlan.collection.name) private dietPlanModel: DietPlanModel,
+		@InjectModel(Meal.collection.name) private mealModel: MealModel,
 	) {}
 
 	async findDietPlan(id: ObjectId) {
@@ -30,31 +32,29 @@ export class DietPlanService {
 				],
 			});
 
-			console.log("-----------");
-			const result = query.data.choices[0].message.content;
-			console.log(result);
-
-			const body = {
-				name: "Test",
+			const newDietPlan = new this.dietPlanModel({
 				frequency: "daily",
 				meals: [],
-				days: {
-					monday: null,
-					tuesday: null,
-					wednesday: null,
-					thursday: null,
-					friday: null,
-					saturday: null,
-					sunday: null,
-				},
-				dietPlan: null,
-			};
+				weeklyDietPlan: null,
+			});
 
-			this.dietPlanModel.create();
+			const dietPlan = await newDietPlan.save();
 
-			const dietPlan = new DietPlan();
-			dietPlan.name = "test";
-			return dietPlan.save();
+			const response = query.data.choices[0].message.content;
+			console.log(response, "RESPONSE");
+			const listOfMeals = extractMealsFromApiResponse(this.mealModel, response);
+			console.log(listOfMeals, "LIST OF MEALS");
+
+			const listOfMealDocuments = await Promise.all(
+				listOfMeals.map(async (meal) => {
+					meal.dietPlan = dietPlan;
+					return await meal.save();
+				}),
+			);
+
+			newDietPlan.meals = listOfMealDocuments;
+			console.log(listOfMealDocuments, "HERE");
+			return newDietPlan.save();
 		} catch (error) {
 			throw new HttpException(
 				"Couldn't create diet plan",
