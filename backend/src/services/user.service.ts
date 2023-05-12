@@ -4,7 +4,7 @@ import { User, UserModel } from "../models/user.schema";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { UserInterface } from "src/utils/interfaces";
-import { HydratedDocument, Model } from "mongoose";
+import { HydratedDocument } from "mongoose";
 
 @Injectable()
 export class UserService {
